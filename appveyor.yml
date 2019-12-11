@@ -28,7 +28,7 @@ for:
     - provider: GitHub
       description: nightly
       auth_token:
-      secure: QDEGzc09i3TjexbQdbxWkOIfYdIkoFZDOyG4e+uFywRQQ5JDuyO3eFPW9dAlf+5u
+        secure: QDEGzc09i3TjexbQdbxWkOIfYdIkoFZDOyG4e+uFywRQQ5JDuyO3eFPW9dAlf+5u
       artifact: amxx-debugger-server-linux
       on:
         branch: master
@@ -54,7 +54,7 @@ for:
     - provider: GitHub
       description: nightly
       auth_token:
-      secure: QDEGzc09i3TjexbQdbxWkOIfYdIkoFZDOyG4e+uFywRQQ5JDuyO3eFPW9dAlf+5u
+        secure: QDEGzc09i3TjexbQdbxWkOIfYdIkoFZDOyG4e+uFywRQQ5JDuyO3eFPW9dAlf+5u
       artifact: amxx-debugger-server-win32
       on:
         branch: master
