@@ -1,90 +1,60 @@
-environment:
-  matrix:
-  - job_name: Windows
-    appveyor_build_worker_image: Visual Studio 2019
-    job_group: Build
-  - job_name: Linux
-    appveyor_build_worker_image: Ubuntu
-    job_group: Build
-  - job_name: Pack
-    appveyor_build_worker_image: Visual Studio 2019
-    job_depends_on: Build
-  - job_name: Deploy
-    job_depends_on: Pack
-version: 1.0-{build}
+version: 0.1 b{build}
+skip_tags: true
+image:
+  - Visual Studio 2019
+  - Ubuntu
+configuration: Release
+clone_depth: 1
 for:
 -
   matrix:
     only:
-      - job_name: Windows
-        job_group: Build
-  build_script:
-    - git submodule update --init --recursive
-    - mkdir build
-    - cd build
-    - cmake -T v142,host=x64 -G "Visual Studio 16 2019" -A Win32 ..
-    - cd ..
-    - cmake --build build --config Release --parallel
-  artifacts:
-    - path: 'build\*.dll'
--
-  matrix:
-    only:
-      - job_name: Linux
-        job_group: Build
+      - image: Ubuntu
   install:
     - sudo apt-get update
-    - sudo apt-get --assume-yes install gcc-multilib g++-multilib
+    - sudo apt-get --assume-yes install gcc-multilib g++-multilib p7zip-full
   build_script:
-    - git submodule update --init --recursive
     - mkdir build
     - cd build
     - cmake -DCMAKE_TOOLCHAIN_FILE=cmake/linux-i686.cmake -DCMAKE_BUILD_TYPE=Release ..
     - cd ..
     - cmake --build build --config Release --parallel
+  after_build:
+    - sh: 7z a amxx-debugger-server-linux.zip ./build/debugger_amxx_i386.so
   artifacts:
-    - path: 'build/*.so'
--
-  matrix:
-    only:
-      - job_name: Pack
-  build_script:
-    - ps: >-
-        $baseArtifactsFolder = "modules";
-        $localArtifactsLocation = Join-Path $baseArtifactsFolder -ChildPath $env:appveyor_project_name;
-        
-        New-Item $localArtifactsLocation -ItemType Directory | Out-Null;
-        
-        $buildJobNames = @("Windows", "Linux");
-        
-        $currentBuildInfo = Invoke-RestMethod -Method Get -Uri "$env:appveyor_url/api/projects/$env:appveyor_account_name/$env:appveyor_project_slug/builds/$env:appveyor_build_id";
-        
-        foreach ($job in $currentBuildInfo.build.jobs) {
-            if (-not ($job.name -in $buildJobNames)) {
-                continue;
-            }
-            if (-not ($job.status -eq "success")) {
-                throw;
-            }
-            
-            $artifacts = Invoke-RestMethod -Method Get -Uri "$env:appveyor_url/api/buildjobs/$($job.jobId)/artifacts";
-            
-            foreach ($artifact in $artifacts) {
-                $localArtifactPath = Join-Path $localArtifactsLocation -ChildPath $(Split-Path $artifact.fileName -Leaf);
-                
-                Invoke-RestMethod -Method Get -Uri "$env:appveyor_url/api/buildjobs/$($job.jobId)/artifacts/$($artifact.fileName)" -OutFile $localArtifactPath;
-            }
-        }
-                
-        Compress-Archive "$($env:appveyor_project_name)_$env:appveyor_build_version.zip" -DestinationPath "$($env:appveyor_project_name).zip";
-  artifacts:
-    - path: '*.zip'
--
-  matrix:
-    only:
-      - job_name: Deploy    
+    - path: amxx-debugger-server-linux.zip
+      name: amxx-debugger-server-linux
   deploy:
     - provider: GitHub
+      description: nightly
       auth_token:
-        secure: QDEGzc09i3TjexbQdbxWkOIfYdIkoFZDOyG4e+uFywRQQ5JDuyO3eFPW9dAlf+5u
-      artifact: amxx-debugger-server.zip
+      secure: QDEGzc09i3TjexbQdbxWkOIfYdIkoFZDOyG4e+uFywRQQ5JDuyO3eFPW9dAlf+5u
+      artifact: amxx-debugger-server-linux
+      on:
+        branch: master
+      prerelease: true
+-
+
+  matrix:
+    only:
+       - image: Visual Studio 2019
+  build_script:
+    - mkdir build
+    - cd build
+    - cmake -T v142,host=x64 -G "Visual Studio 16 2019" -A Win32 ..
+    - cd ..
+    - cmake --build build --config Release --parallel    
+  after_build:
+    - cmd: 7z a amxx-debugger-server-win32.zip ./build/debugger_amxx.dll
+  artifacts:
+    - path: amxx-debugger-server-win32.zip
+      name: amxx-debugger-server-win32
+  deploy:
+    - provider: GitHub
+      description: nightly
+      auth_token:
+      secure: QDEGzc09i3TjexbQdbxWkOIfYdIkoFZDOyG4e+uFywRQQ5JDuyO3eFPW9dAlf+5u
+      artifact: amxx-debugger-server-win32
+      on:
+        branch: master
+      prerelease: true
