@@ -1,0 +1,54 @@
+# vim: set ts=8 sts=2 sw=2 tw=99 et ft=python: 
+# 
+# Copyright (C) 2004-2012 David Anderson
+# 
+# This file is part of SourcePawn.
+# 
+# SourcePawn is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+# 
+# SourcePawn is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# SourcePawn. If not, see http://www.gnu.org/licenses/.
+#
+import os
+
+binary = KE.Program(builder, 'testrunner')
+compiler = binary.compiler
+compiler.includes += [
+  os.path.join(builder.sourcePath, 'amtl'),
+  os.path.join(builder.sourcePath),
+]
+
+if compiler.like('msvc'):
+  compiler.linkflags.append('/SUBSYSTEM:CONSOLE')
+if builder.target_platform == 'linux':
+  compiler.linkflags.append('-ldl')
+
+binary.sources += [
+  'main.cpp',
+  'test-callable.cpp',
+  'test-hashmap.cpp',
+  'test-inlinelist.cpp',
+  'test-linkedlist.cpp',
+  'test-vector.cpp',
+  'test-refcounting.cpp',
+  'test-threadlocal-threaded.cpp',
+  'test-threadlocal-unthreaded.cpp',
+  'test-threadutils.cpp',
+  'test-deque.cpp',
+  'test-system.cpp',
+  'test-priority-queue.cpp',
+  'test-string.cpp',
+  'test-autoptr.cpp',
+  'test-uniqueptr.cpp',
+  'test-flags.cpp',
+  'test-argparser.cpp',
+]
+
+builder.Add(binary)

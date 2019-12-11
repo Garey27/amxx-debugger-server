@@ -1,0 +1,7 @@
+[submodule "deps/subhook"]
+	path = deps/subhook
+	url = https://github.com/Zeex/subhook
+
+[submodule "deps/brynet"]
+	path = deps/brynet
+	url = https://github.com/IronsDu/brynet
