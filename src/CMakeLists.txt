@@ -47,7 +47,7 @@ if(WIN32)
 elseif(UNIX)
   set(CMAKE_CXX_FLAGS "-fpermissive")
   find_package(Threads REQUIRED)
-  target_link_libraries(debugger pthread)
+  target_link_libraries(debugger pthread -static-libgcc -static-libstdc++)
 endif()
 install(TARGETS debugger LIBRARY DESTINATION ".")
 
