@@ -3,7 +3,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 cmake_minimum_required(VERSION 2.8.8)
 project(debugger)
-option(DEBUGGER_USE_STATIC_RUNTIME "Use static C++ runtime" OFF)
+option(DEBUGGER_USE_STATIC_RUNTIME "Use static C++ runtime" ON)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
