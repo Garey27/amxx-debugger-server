@@ -1,38 +1,10 @@
 version: 0.1 b{build}
 skip_tags: true
 image:
-  - Visual Studio 2019
   - Ubuntu1604
+  - Visual Studio 2019
 configuration: Release
 for:
--
-  matrix:
-    only:
-      - image: Ubuntu
-  install:
-    - sudo apt-get update
-    - sudo apt-get --assume-yes install gcc-multilib g++-multilib p7zip-full
-  build_script:
-    - git submodule update --init --recursive
-    - mkdir build
-    - cd build
-    - cmake -DCMAKE_TOOLCHAIN_FILE=cmake/linux-i686.cmake -DCMAKE_BUILD_TYPE=Release ..
-    - cd ..
-    - cmake --build build --config Release --parallel
-  after_build:
-    - sh: 7z a amxx-debugger-server-linux.zip ./build/debugger_amxx_i386.so
-  artifacts:
-    - path: amxx-debugger-server-linux.zip
-      name: amxx-debugger-server-linux
-  deploy:
-    - provider: GitHub
-      description: nightly
-      auth_token:
-        secure: QDEGzc09i3TjexbQdbxWkOIfYdIkoFZDOyG4e+uFywRQQ5JDuyO3eFPW9dAlf+5u
-      artifact: amxx-debugger-server-linux
-      on:
-        branch: master
-      prerelease: true
 -
 
   matrix:
@@ -56,6 +28,34 @@ for:
       auth_token:
         secure: QDEGzc09i3TjexbQdbxWkOIfYdIkoFZDOyG4e+uFywRQQ5JDuyO3eFPW9dAlf+5u
       artifact: amxx-debugger-server-win32
+      on:
+        branch: master
+      prerelease: true
+-
+  matrix:
+    only:
+      - image: Ubuntu1604
+  install:
+    - sudo apt-get update
+    - sudo apt-get --assume-yes install gcc-multilib g++-multilib p7zip-full
+  build_script:
+    - git submodule update --init --recursive
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_TOOLCHAIN_FILE=cmake/linux-i686.cmake -DCMAKE_BUILD_TYPE=Release ..
+    - cd ..
+    - cmake --build build --config Release --parallel
+  after_build:
+    - sh: 7z a amxx-debugger-server-linux.zip ./build/debugger_amxx_i386.so
+  artifacts:
+    - path: amxx-debugger-server-linux.zip
+      name: amxx-debugger-server-linux
+  deploy:
+    - provider: GitHub
+      description: nightly
+      auth_token:
+        secure: QDEGzc09i3TjexbQdbxWkOIfYdIkoFZDOyG4e+uFywRQQ5JDuyO3eFPW9dAlf+5u
+      artifact: amxx-debugger-server-linux
       on:
         branch: master
       prerelease: true
