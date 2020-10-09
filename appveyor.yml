@@ -2,7 +2,7 @@ version: 0.1 b{build}
 skip_tags: true
 image:
   - Visual Studio 2019
-  - Ubuntu
+  - Ubuntu1604
 configuration: Release
 for:
 -
